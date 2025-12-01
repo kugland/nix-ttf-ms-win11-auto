@@ -1,0 +1,32 @@
+{
+  "version": "26100.1.240331_1435-1",
+  "repo": "ttf-ms-win11-fod-auto",
+  "iso": "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1.240331-1435.ge_release_amd64fre_CLIENT_LOF_PACKAGES_OEM.iso",
+  "archive": "LanguagesAndOptionalFeatures/*Fonts*.cab",
+  "parentDir": "*/",
+  "files": [
+    "aparajbi.ttf",
+    "aparajb.ttf",
+    "aparaji.ttf",
+    "aparaj.ttf",
+    "kokilabi.ttf",
+    "kokilab.ttf",
+    "kokilai.ttf",
+    "kokila.ttf",
+    "mangalb.ttf",
+    "mangal.ttf",
+    "Sanskr.ttf",
+    "utsaahbi.ttf",
+    "utsaahb.ttf",
+    "utsaahi.ttf",
+    "utsaah.ttf"
+  ],
+  "outputHash": "sha256-caeiHlqU9djr8GI82rlbwXhDi2LIzHpuu40ZBy0aS+M=",
+  "fontNames": [
+    "Aparajita",
+    "Kokila",
+    "Mangal",
+    "Sanskrit Text",
+    "Utsaah"
+  ]
+}

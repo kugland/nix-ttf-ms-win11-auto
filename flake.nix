@@ -13,7 +13,6 @@
   }:
     flake-parts.lib.mkFlake {inherit inputs;}
     {
-      debug = true;
       imports = [
         inputs.devshell.flakeModule
         inputs.flake-parts.flakeModules.easyOverlay
@@ -37,14 +36,17 @@
         };
         packages = let
           allPackages =
-            pkgs.lib.mapAttrs (
-              pkgName: pkgData:
-                (import ./mkPackage.nix) {
-                  inherit pkgs pkgName;
-                  inherit (pkgData) version iso archive files outputHash parentDir;
-                }
-            )
-            (builtins.fromJSON (builtins.readFile ./pkgs.json));
+            pkgs.lib.mapAttrs' (jsonFileName: _: let
+              pkgName = pkgs.lib.removeSuffix ".json" jsonFileName;
+              pkgData = builtins.fromJSON (builtins.readFile ./pkgs/${jsonFileName});
+            in {
+              name = pkgName;
+              value = (import ./mkPackage.nix) {
+                inherit pkgs pkgName;
+                inherit (pkgData) archive files iso outputHash parentDir version;
+              };
+            })
+            (builtins.readDir ./pkgs);
         in
           allPackages
           // rec {
@@ -76,6 +78,7 @@
           packages = with pkgs; [
             git
             jq
+            parallel
             (pkgs.python3.withPackages (p: [
               p.fontforge
             ]))

@@ -1,0 +1,17 @@
+{
+  "version": "26100.1.240331_1435-1",
+  "repo": "ttf-ms-win11-fod-auto",
+  "iso": "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1.240331-1435.ge_release_amd64fre_CLIENT_LOF_PACKAGES_OEM.iso",
+  "archive": "LanguagesAndOptionalFeatures/*Fonts*.cab",
+  "parentDir": "*/",
+  "files": [
+    "dokchamp.ttf",
+    "LaoUIb.ttf",
+    "LaoUI.ttf"
+  ],
+  "outputHash": "sha256-U30W3bwlO7xVG9Tvg5L4bGqXnhWUU+MFKSVbfTOnvkQ=",
+  "fontNames": [
+    "DokChampa",
+    "Lao UI"
+  ]
+}

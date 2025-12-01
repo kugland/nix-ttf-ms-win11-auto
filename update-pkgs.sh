@@ -9,17 +9,8 @@ REPOS=(
 )
 
 clean() {
-    rm -f pkgs.json pkgs.tmp.json
+    rm -f pkgs/*.{json,json.tmp}
     rm -rf upstream
-}
-
-update_json() {
-    jq -S "${@}" <pkgs.json >pkgs.tmp.json
-    mv pkgs.tmp.json pkgs.json
-}
-
-get_pkg_prop() {
-    jq -r --arg pkg "$1" --arg prop "$2" '.[$pkg].[$prop]' <pkgs.json
 }
 
 clone_repo() {
@@ -27,6 +18,22 @@ clone_repo() {
     mkdir -p "upstream/$1"
     git clone "https://aur.archlinux.org/$1.git" "upstream/$1"
 }
+
+update_json() {
+	mkdir -p pkgs
+	local pkg="$1"
+	shift
+	test -f "pkgs/$pkg.json" || printf '%s' '{}' >"pkgs/$pkg.json"
+    jq "${@}" <"pkgs/$pkg.json" >"pkgs/$pkg.json.tmp"
+    mv "pkgs/$pkg.json.tmp" "pkgs/$pkg.json"
+}
+export -f update_json
+
+get_pkg_prop() {
+	test -f "pkgs/$1.json" || printf '%s' '{}' >"pkgs/$1.json"
+    jq -r --arg prop "$2" '.[$prop]' <"pkgs/$1.json"
+}
+export -f get_pkg_prop
 
 get_output_hash() {
     local pkg="$1"
@@ -43,6 +50,7 @@ get_output_hash() {
         sed -Ene '/^[[:blank:]]+got:[[:blank:]]+(sha256-.{44})$/{s//\1/;p}' <<<"$build_output"
     fi
 }
+export -f get_output_hash
 
 update_pkg() {
     local repo="$1"
@@ -61,36 +69,38 @@ update_pkg() {
 		)"
 
         _package() {
-            echo "Updating package '$pkg' to version $version..."
-            current_version="$(get_pkg_prop "$pkg" version || echo "")"
-            current_output_hash="$(get_pkg_prop "$pkg" outputHash || echo "")"
+            echo "🟢 $pkg: Updating package to version $version..."
+			local files=( "$@" )
+            local current_version="$(get_pkg_prop "$pkg" version || echo "")"
+            local current_output_hash="$(get_pkg_prop "$pkg" outputHash || echo "")"
             if [ "$current_version" == "$version" ] && [ "$current_output_hash" != "" ]; then
                 echo "✅ Package '$pkg' is up to date (version $version). Skipping."
                 return
             fi
-            update_json '
-						setpath([$pkg, "version"]; $version) |
-						setpath([$pkg, "iso"]; $iso) |
-						setpath([$pkg, "archive"]; $archive) |
-						setpath([$pkg, "parentDir"]; $parent_dir) |
-						setpath([$pkg, "files"]; $files) |
-						setpath([$pkg, "outputHash"]; "")' \
-                --arg pkg "$pkg" \
+            update_json "$pkg" '
+						setpath(["version"]; $version) |
+						setpath(["repo"]; $repo) |
+						setpath(["iso"]; $iso) |
+						setpath(["archive"]; $archive) |
+						setpath(["parentDir"]; $parent_dir) |
+						setpath(["files"]; $files) |
+						setpath(["outputHash"]; "")' \
                 --arg version "$version" \
+				--arg repo "$repo" \
                 --arg iso "$iso" \
                 --arg archive "$archive" \
                 --arg parent_dir "$parent_dir" \
-                --argjson files "$(printf '%s\n' "$@" | jq -R . | jq -s .)"
-            echo "⌛ Calculating output hash for package '$pkg', please wait..."
-            output_hash=$(get_output_hash "$pkg")
-            update_json 'setpath([$pkg, "outputHash"]; $outputHash)' \
-                --arg pkg "$pkg" \
+                --argjson files "$(printf '%s\n' "${files[@]}" | sort | jq -R . | jq -s .)"
+            echo "⌛ $pkg: Calculating output hash for package, please wait..."
+            local output_hash=$(get_output_hash "$pkg")
+            update_json "$pkg" 'setpath(["outputHash"]; $outputHash)' \
                 --arg outputHash "$output_hash"
-            echo "✅ Updated package '$pkg' to version $version."
+            echo "✅ $pkg: Updated package to version $version."
         }
         "package_$pkg"
     )
 }
+export -f update_pkg
 
 update_from_repo() {
     local repo="$1"
@@ -98,40 +108,46 @@ update_from_repo() {
         sed -Ene 's/^[[:blank:]]*package_(ttf-ms-win11-[^[:blank:]]+)[[:blank:]]*\(\)[[:blank:]]*\{?$/\1/p' "upstream/$repo/PKGBUILD"
     ))
 
-    for pkg in "${packages[@]}"; do
-        update_pkg "$repo" "$pkg"
-    done
+    parallel --halt now,fail=1 --line-buffer update_pkg "$repo" {} ::: "${packages[@]}"
 }
 
 update_all() {
-    if ! [ -f pkgs.json ]; then
-        printf '%s' '{}' >pkgs.json
-    fi
     for repo in "${REPOS[@]}"; do
         clone_repo "$repo"
         update_from_repo "$repo"
+		extract_names
     done
 }
 
-extract_names() {
-    echo "Extracting font names for README.md..."
-    all_pkgs=($(jq -r 'keys | .[]' <pkgs.json))
-    for pkg in "${all_pkgs[@]}"; do
-        typeset -a font_names
-        font_names=()
-        OUTPATH=$(nix build path:.#$pkg --no-link --print-out-paths)
-        while read fontfile; do
-            font_name="$(python3 -c "from sys import argv; import fontforge; font = fontforge.open(argv[1]); print(font.familyname)" "${fontfile}" 2>/dev/null)"
-            font_names+=("$font_name")
-        done < <(find "$OUTPATH" -type f -name "*.ttf" -o -name "*.otf" -o -name "*.ttc")
-        echo "- \`${pkg}\`:"
-        printf "  - *%s*\n" "${font_names[@]}" | sort | uniq
-    done >extracted-names.md
+extract_font_names_from_pkg() {
+	local pkg="$1"
+	declare -a font_names=()
+	echo "🟢 $pkg: Extracting font names..."
+	OUTPATH=$(nix build path:.#$pkg --no-link --print-out-paths)
+	while read fontfile; do
+		font_name="$(python3 -c "from sys import argv; import fontforge; font = fontforge.open(argv[1]); print(font.familyname)" "${fontfile}" 2>/dev/null)"
+		font_names+=("$font_name")
+	done < <(find "$OUTPATH" -type f -name "*.ttf" -o -name "*.otf" -o -name "*.ttc" | sort)
+	update_json "$pkg" 'setpath(["fontNames"]; $font_names)' \
+		--argjson font_names "$(printf '%s\n' "${font_names[@]}" | sort | uniq | jq -R . | jq -s .)"
+	echo "✅ $pkg: Extracted font names."
+}
+export -f extract_font_names_from_pkg
 
-    awk '
+extract_names() {
+    all_pkgs=( $(cd pkgs && ls | sed 's/\.json$//' | sort) )
+	parallel --halt now,fail=1 --line-buffer extract_font_names_from_pkg {} ::: "${all_pkgs[@]}"
+
+	for pkg in "${all_pkgs[@]}"; do
+		echo "- \`$pkg\`:"
+		<"pkgs/$pkg.json" jq -r '.fontNames | .[]' | xargs -d$'\n' printf "  - *%s*\n"
+	done >extracted-names.md.tmp
+
+    echo "🟢 Updating README.md..."
+	awk '
 		/<!-- begin generated by extract-names -->/ {
 			print;
-			while ((getline line <"extracted-names.md") > 0) {
+			while ((getline line <"extracted-names.md.tmp") > 0) {
 				print line;
 			}
 			skip = 1;
@@ -144,13 +160,11 @@ extract_names() {
 		}
 		!skip' README.md >README.md.tmp
     mv README.md.tmp README.md
-    rm -f extracted-names.md
+    rm -f extracted-names.md.tmp
+	echo "✅ Done."
 }
 
 case "${1:-}" in
-clean)
-    clean
-    ;;
 update)
     update_all
     ;;
@@ -158,11 +172,8 @@ force-update)
     clean
     update_all
     ;;
-extract-names)
-    extract_names
-    ;;
 *)
-    echo "Usage: $0 {clean|update|force-update|extract-names}"
+    echo "Usage: $0 {clean|update|force-update}"
     exit 1
     ;;
 esac

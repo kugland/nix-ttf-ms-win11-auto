@@ -1,0 +1,17 @@
+{
+  "version": "10.0.26100.1742-4",
+  "repo": "ttf-ms-win11-auto",
+  "iso": "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1742.240906-0331.ge_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+  "archive": "sources/install.wim",
+  "parentDir": "Windows/Fonts/",
+  "files": [
+    "LeelaUIb.ttf",
+    "LeelawUI.ttf",
+    "LeelUIsl.ttf"
+  ],
+  "outputHash": "sha256-WyMipJ+0eX3LzWY3WaN5111Ew3La15PWD3XqWEOL0p8=",
+  "fontNames": [
+    "Leelawadee UI",
+    "Leelawadee UI Semilight"
+  ]
+}

@@ -302,6 +302,25 @@ provide are as follows:
 
 In order to extract the fonts _without_ having to download the entire Windows 11 ISO, we mount the ISO directly from Microsoft’s server using `httpdirfs`. However, `httpdirfs` requires FUSE, which is not available in the standard Nix build sandbox (it doesn’t have access to `/dev/fuse`); to circumvent this, we run the extraction process inside a virtual machine using `pkgs.vmTools.runInLinuxVM`, where we can `mknod` our way to FUSE.
 
+## Updating the packages
+
+The update process involves getting the latest AUR packages `ttf-ms-win11-auto`
+and `ttf-ms-win11-fod-auto`, extracting the information from them, building the
+Nix packages to get the output hashes, and updating the `README.md` to list the
+available fonts.
+
+To run the automated update process, run:
+
+```bash
+nix develop -c update-pkgs
+```
+
+or, to force re-extraction of all packages, regardless of version changes:
+
+```bash
+nix develop -c update-pkgs-force
+```
+
 ## License
 
 The fonts downloaded by this flake are proprietary software owned by Microsoft. This repository, however, doesn’t contain the font files themselves, only the Nix code to extract and package them, and this code is licensed under the MIT License; see the LICENSE file for details.

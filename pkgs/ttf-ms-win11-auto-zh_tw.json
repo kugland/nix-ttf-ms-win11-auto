@@ -1,0 +1,19 @@
+{
+  "version": "10.0.26100.1742-4",
+  "repo": "ttf-ms-win11-auto",
+  "iso": "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1742.240906-0331.ge_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+  "archive": "sources/install.wim",
+  "parentDir": "Windows/Fonts/",
+  "files": [
+    "mingliub.ttc",
+    "msjhbd.ttc",
+    "msjhl.ttc",
+    "msjh.ttc"
+  ],
+  "outputHash": "sha256-eBzL6IHX7rB85iJr4IuH29TD7fzIXuXsUiAzXcPC9qE=",
+  "fontNames": [
+    "Microsoft JhengHei",
+    "Microsoft JhengHei Light",
+    "MingLiU-ExtB"
+  ]
+}

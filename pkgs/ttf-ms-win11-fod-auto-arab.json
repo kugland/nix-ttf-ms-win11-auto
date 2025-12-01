@@ -1,0 +1,35 @@
+{
+  "version": "26100.1.240331_1435-1",
+  "repo": "ttf-ms-win11-fod-auto",
+  "iso": "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1.240331-1435.ge_release_amd64fre_CLIENT_LOF_PACKAGES_OEM.iso",
+  "archive": "LanguagesAndOptionalFeatures/*Fonts*.cab",
+  "parentDir": "*/",
+  "files": [
+    "aldhabi.ttf",
+    "andlso.ttf",
+    "arabtype.ttf",
+    "majallab.ttf",
+    "majalla.ttf",
+    "msuighub.ttf",
+    "msuighur.ttf",
+    "simpbdo.ttf",
+    "simpfxo.ttf",
+    "simpo.ttf",
+    "tradbdo.ttf",
+    "trado.ttf",
+    "UrdTypeb.ttf",
+    "UrdType.ttf"
+  ],
+  "outputHash": "sha256-chGzEcy2uFAGCzpQ6/8NyaSzGpKA6VqJLsr7Yh/xXx0=",
+  "fontNames": [
+    "Aldhabi",
+    "Andalus",
+    "Arabic Typesetting",
+    "Microsoft Uighur",
+    "Sakkal Majalla",
+    "Simplified Arabic",
+    "Simplified Arabic Fixed",
+    "Traditional Arabic",
+    "Urdu Typesetting"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "version": "26100.1.240331_1435-1",
+  "repo": "ttf-ms-win11-fod-auto",
+  "iso": "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1.240331-1435.ge_release_amd64fre_CLIENT_LOF_PACKAGES_OEM.iso",
+  "archive": "LanguagesAndOptionalFeatures/*Fonts*.cab",
+  "parentDir": "*/",
+  "files": [
+    "BIZ-UDGothicB.ttc",
+    "BIZ-UDGothicR.ttc",
+    "BIZ-UDMinchoM.ttc",
+    "meiryob.ttc",
+    "meiryo.ttc",
+    "msgothic.ttc",
+    "msmincho.ttc",
+    "UDDigiKyokashoN-B.ttc",
+    "UDDigiKyokashoN-R.ttc",
+    "yumindb.ttf",
+    "yuminl.ttf",
+    "yumin.ttf"
+  ],
+  "outputHash": "sha256-J+evNnGcG8wnzUifdsEoLsz6qZCimCn16iig14U0BjU=",
+  "fontNames": [
+    "BIZ UDGothic",
+    "BIZ UDMincho Medium",
+    "Meiryo",
+    "MS Gothic",
+    "MS Mincho",
+    "UD Digi Kyokasho N",
+    "Yu Mincho",
+    "Yu Mincho Demibold",
+    "Yu Mincho Light"
+  ]
+}
